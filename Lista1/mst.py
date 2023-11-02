@@ -6,6 +6,7 @@ import os
 from matplotlib import pyplot as plt
 
 MAX_WEIGHT = 9999999999
+final_ans = []
 
 def minimum_key(key: [int], mst_set: [bool], size: int):
 	min = MAX_WEIGHT
@@ -27,7 +28,17 @@ def MST(parent: [int], size: int):
 
 	return v
 
-# def DFS():
+def DFS(edges_list: [[int]], num_nodes: int, starting_vertex: int, visited_nodes: [bool]):
+	final_ans.append(starting_vertex)
+	visited_nodes[starting_vertex] = True
+
+	for i in range(num_nodes):
+		if i == starting_vertex:
+			continue
+		if edges_list[starting_vertex][i] == 1:
+			if visited_nodes[i]:
+				continue
+			DFS(edges_list, num_nodes, i, visited_nodes)
 
 def weight_MST(parent, graph, size):
     weight = 0
@@ -53,8 +64,8 @@ def prim_MST(graph: [[int]], size: int):
 				parent[v] = u
 				key[v] = graph[u][v]
 
-	adj_list = MST(parent, size)
-	return adj_list, parent
+	mst = MST(parent, size)
+	return mst, parent
 
 def plot_MST(graph: [[int]], points: [par.Point], file_name: str, weight: int):
 	for i in range(0, len(graph)):
@@ -69,13 +80,31 @@ def plot_MST(graph: [[int]], points: [par.Point], file_name: str, weight: int):
 	plt.savefig(f'./graphs/MST_{file_name}')
 	plt.close()
 
-def main() -> int:
+def convert_MST_to_adjacency_matrix(mst: [[int]]):
+	size = len(mst)
+	print(size)
+	edges_list = [[0 for i in range(size + 1)] for j in range(size + 1)]
+	for i in range(size):
+		first_node = mst[i][0]
+		second_node = mst[i][1]
+		edges_list[first_node][second_node] = 1
+		edges_list[second_node][first_node] = 1
+
+	return edges_list
+
+
+def main():
 	for file_name in os.listdir('data'):
 		file_name = file_name[:-4]
 		result, points = par.parse(f'./data/{file_name}.tsp')
 		mst, parent = prim_MST(result, len(result))
 		weight = weight_MST(parent, result, len(result))
 		plot_MST(mst, points, file_name, int(weight))
+
+		edges_list = convert_MST_to_adjacency_matrix(mst)
+		visited_nodes = [False] * len(mst)
+		DFS(edges_list, len(mst), 0, visited_nodes)
+		final_ans.append(final_ans[0])
 
 if __name__ == '__main__':
     main()
