@@ -1,11 +1,4 @@
-NAME : pka379
-COMMENT : Bonn VLSI data set with 379 points
-COMMENT : Uni Bonn, Research Institute for Discrete Math
-COMMENT : Contributed by Andre Rohe
-TYPE : TSP
 DIMENSION : 379
-EDGE_WEIGHT_TYPE : EUC_2D
-NODE_COORD_SECTION
 1 2 11
 2 2 14
 3 2 16
@@ -385,4 +378,3 @@ NODE_COORD_SECTION
 377 293 31
 378 299 20
 379 299 31
-EOF

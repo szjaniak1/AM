@@ -1,11 +1,4 @@
-NAME : xqf131
-COMMENT : Bonn VLSI data set with 131 points
-COMMENT : Uni Bonn, Research Institute for Discrete Math
-COMMENT : Contributed by Andre Rohe
-TYPE : TSP
 DIMENSION : 131
-EDGE_WEIGHT_TYPE : EUC_2D
-NODE_COORD_SECTION
 1 0 13
 2 0 26
 3 0 27
@@ -137,4 +130,3 @@ NODE_COORD_SECTION
 129 84 38
 130 84 6
 131 107 27
-EOF

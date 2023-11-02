@@ -1,11 +1,4 @@
-NAME : pbk411
-COMMENT : Bonn VLSI data set with 411 points
-COMMENT : Uni Bonn, Research Institute for Discrete Math
-COMMENT : Contributed by Andre Rohe
-TYPE : TSP
 DIMENSION : 411
-EDGE_WEIGHT_TYPE : EUC_2D
-NODE_COORD_SECTION
 1 0 38
 2 0 39
 3 0 40
@@ -417,4 +410,3 @@ NODE_COORD_SECTION
 409 110 85
 410 110 88
 411 122 45
-EOF

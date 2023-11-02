@@ -1,11 +1,4 @@
-NAME : pma343
-COMMENT : Bonn VLSI data set with 343 points
-COMMENT : Uni Bonn, Research Institute for Discrete Math
-COMMENT : Contributed by Andre Rohe
-TYPE : TSP
 DIMENSION : 343
-EDGE_WEIGHT_TYPE : EUC_2D
-NODE_COORD_SECTION
 1 0 13
 2 0 16
 3 0 19
@@ -349,4 +342,3 @@ NODE_COORD_SECTION
 341 294 35
 342 299 16
 343 299 21
-EOF

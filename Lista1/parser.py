@@ -26,7 +26,7 @@ def calculate_weight(points: [Point]):
 		for j in range(size):
 			result[i][j] = get_weight(points[i], points[j])
 
-	return result
+	return result, points
 
 def get_weight(point1: Point, point2: Point):
 	return sqrt(pow((point1.pos_x - point2.pos_x), 2) + pow((point1.pos_y - point2.pos_y), 2))

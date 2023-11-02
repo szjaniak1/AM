@@ -1,11 +1,4 @@
-NAME : pbn423
-COMMENT : Bonn VLSI data set with 423 points
-COMMENT : Uni Bonn, Research Institute for Discrete Math
-COMMENT : Contributed by Andre Rohe
-TYPE : TSP
 DIMENSION : 423
-EDGE_WEIGHT_TYPE : EUC_2D
-NODE_COORD_SECTION
 1 0 12
 2 0 25
 3 0 26
@@ -429,4 +422,3 @@ NODE_COORD_SECTION
 421 110 72
 422 110 74
 423 110 75
-EOF

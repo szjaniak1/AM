@@ -1,11 +1,4 @@
-NAME : bcl380
-COMMENT : Bonn VLSI data set with 380 points
-COMMENT : Uni Bonn, Research Institute for Discrete Math
-COMMENT : Contributed by Andre Rohe
-TYPE : TSP
 DIMENSION : 380
-EDGE_WEIGHT_TYPE : EUC_2D
-NODE_COORD_SECTION
 1 0 108
 2 0 20
 3 0 21
@@ -386,4 +379,3 @@ NODE_COORD_SECTION
 378 99 51
 379 99 68
 380 99 85
-EOF

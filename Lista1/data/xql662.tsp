@@ -1,11 +1,4 @@
-NAME : xql662
-COMMENT : Bonn VLSI data set with 662 points
-COMMENT : Uni Bonn, Research Institute for Discrete Math
-COMMENT : Contributed by Andre Rohe
-TYPE : TSP
 DIMENSION : 662
-EDGE_WEIGHT_TYPE : EUC_2D
-NODE_COORD_SECTION
 1 0 20
 2 0 39
 3 0 45
@@ -668,4 +661,3 @@ NODE_COORD_SECTION
 660 227 52
 661 227 57
 662 227 71
-EOF

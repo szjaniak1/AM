@@ -1,11 +1,4 @@
-NAME : pbm436
-COMMENT : Bonn VLSI data set with 436 points
-COMMENT : Uni Bonn, Research Institute for Discrete Math
-COMMENT : Contributed by Andre Rohe
-TYPE : TSP
 DIMENSION : 436
-EDGE_WEIGHT_TYPE : EUC_2D
-NODE_COORD_SECTION
 1 0 15
 2 0 22
 3 0 29
@@ -442,4 +435,3 @@ NODE_COORD_SECTION
 434 110 98
 435 122 45
 436 122 73
-EOF

@@ -1,11 +1,4 @@
-NAME : pbl395
-COMMENT : Bonn VLSI data set with 395 points
-COMMENT : Uni Bonn, Research Institute for Discrete Math
-COMMENT : Contributed by Andre Rohe
-TYPE : TSP
 DIMENSION : 395
-EDGE_WEIGHT_TYPE : EUC_2D
-NODE_COORD_SECTION
 1 0 15
 2 0 22
 3 0 29
@@ -401,4 +394,3 @@ NODE_COORD_SECTION
 393 110 42
 394 110 50
 395 122 45
-EOF

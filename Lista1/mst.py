@@ -1,6 +1,9 @@
 import parser as par
 
 import sys
+import numpy as np
+import os
+from matplotlib import pyplot as plt
 
 MAX_WEIGHT = 9999999999
 
@@ -14,10 +17,10 @@ def minimum_key(key: [int], mst_set: [bool], size: int):
 
 	return min_index
 
-def MST(parent: [int], graph: [[int]], size: int):
+def MST(parent: [int], size: int):
 	v = []
 	for i in range(1, size):
-		p = [] * size
+		p = []
 		p.append(parent[i])
 		p.append(i)
 		v.append(p)
@@ -26,10 +29,12 @@ def MST(parent: [int], graph: [[int]], size: int):
 
 # def DFS():
 
-def printMST(parent, graph, size):
-    print("Edge \tWeight")
+def weight_MST(parent, graph, size):
+    weight = 0
     for i in range(1, size):
-        print(parent[i], "-", i, "\t", graph[i][parent[i]])
+    	weight += graph[i][parent[i]]
+
+    return weight
 
 
 def prim_MST(graph: [[int]], size: int):
@@ -48,13 +53,29 @@ def prim_MST(graph: [[int]], size: int):
 				parent[v] = u
 				key[v] = graph[u][v]
 
-	# v = MST(parent, graph, size)
-	return parent
+	adj_list = MST(parent, size)
+	return adj_list, parent
+
+def plot_MST(graph: [[int]], points: [par.Point], file_name: str, weight: int):
+	for i in range(0, len(graph)):
+		v1, v2 = graph[i]
+		p1 = [points[v1].pos_x, points[v1].pos_y]
+		p2 = [points[v2].pos_x, points[v2].pos_y]
+		x_values = [p1[0], p2[0]]
+		y_values = [p1[1], p2[1]]
+		plt.plot(x_values, y_values, marker='.', color='b')
+
+	plt.title(f'{file_name} - weight: {weight}')
+	plt.savefig(f'./graphs/MST_{file_name}')
+	plt.close()
 
 def main() -> int:
-	result = par.parse(str(sys.argv[1]))
-	v = prim_MST(result, len(result))
-	printMST(v, result, len(result))
+	for file_name in os.listdir('data'):
+		file_name = file_name[:-4]
+		result, points = par.parse(f'./data/{file_name}.tsp')
+		mst, parent = prim_MST(result, len(result))
+		weight = weight_MST(parent, result, len(result))
+		plot_MST(mst, points, file_name, int(weight))
 
 if __name__ == '__main__':
     main()
