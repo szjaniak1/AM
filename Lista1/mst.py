@@ -47,6 +47,13 @@ def weight_MST(parent, graph, size):
 
     return weight
 
+def weight_TSP(tsp, graph, size):
+    weight = 0
+    for i in range(0, size - 1):
+    	weight += graph[tsp[i]][tsp[i + 1]]
+
+    return weight
+
 
 def prim_MST(graph: [[int]], size: int):
 	parent = [0] * size
@@ -80,9 +87,20 @@ def plot_MST(graph: [[int]], points: [par.Point], file_name: str, weight: int):
 	plt.savefig(f'./graphs/MST_{file_name}')
 	plt.close()
 
+def plot_TSP(tsp: [int], points: [par.Point], file_name: str, weight: int):
+	data = []
+	for i in tsp:
+		p = [points[i].pos_x, points[i].pos_y]
+		data.append(p)
+
+	data = np.array(data)
+	plt.plot(data[:, 0], data[:, 1], marker='.', color='r')
+	plt.title(f'{file_name} - weight: {weight}')
+	plt.savefig(f'./graphs/TSP_{file_name}')
+	plt.close()
+
 def convert_MST_to_adjacency_matrix(mst: [[int]]):
 	size = len(mst)
-	print(size)
 	edges_list = [[0 for i in range(size + 1)] for j in range(size + 1)]
 	for i in range(size):
 		first_node = mst[i][0]
@@ -104,7 +122,10 @@ def main():
 		edges_list = convert_MST_to_adjacency_matrix(mst)
 		visited_nodes = [False] * len(mst)
 		DFS(edges_list, len(mst), 0, visited_nodes)
-		final_ans.append(final_ans[0])
+
+		weight_tsp = weight_TSP(final_ans, result, len(final_ans))
+		plot_TSP(final_ans, points, file_name, int(weight_tsp))
+		final_ans.clear()
 
 if __name__ == '__main__':
     main()
