@@ -3,7 +3,6 @@ import parser as par
 import sys
 
 MAX_WEIGHT = 9999999999
-result = []
 
 def minimum_key(key: [int], mst_set: [bool], size: int):
 	min = MAX_WEIGHT
@@ -16,13 +15,12 @@ def minimum_key(key: [int], mst_set: [bool], size: int):
 	return min_index
 
 def MST(parent: [int], graph: [[int]], size: int):
-	v = [[] * size] * size
+	v = []
 	for i in range(1, size):
 		p = [] * size
 		p.append(parent[i])
 		p.append(i)
 		v.append(p)
-		p.clear()
 
 	return v
 
@@ -50,13 +48,13 @@ def prim_MST(graph: [[int]], size: int):
 				parent[v] = u
 				key[v] = graph[u][v]
 
-	v = MST(parent, graph, size)
-	return v
+	# v = MST(parent, graph, size)
+	return parent
 
 def main() -> int:
 	result = par.parse(str(sys.argv[1]))
 	v = prim_MST(result, len(result))
-	# print(v)
+	printMST(v, result, len(result))
 
 if __name__ == '__main__':
     main()
