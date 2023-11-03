@@ -3,10 +3,77 @@ import parser as par
 import sys
 import numpy as np
 import os
+import math
 from matplotlib import pyplot as plt
+from numpy.random import shuffle
 
 MAX_WEIGHT = 9999999999
 final_ans = []
+
+def get_path_cost(graph, path):
+    distance = 0
+    for i in range(len(path) - 1):
+        distance += graph[path[i]][path[i+1]]
+
+    distance += graph[path[0]][path[-1]]
+
+    return distance
+
+def get_minimums(graph, path):
+    path = path[:-1]
+
+    min_10_list_y = []
+    min_10_list_x = []
+    min_50_list_y = []
+    min_50_list_x = []
+    min_10_x = 0
+    min_10_y = math.inf
+    min_50_x = 0
+    min_50_y = math.inf
+    min_1000_x = 0
+    min_1000_y = math.inf
+    for i in range(1, 1001):
+        shuffle(path)
+
+        cost = get_path_cost(graph, path)
+        if cost < min_10_y:
+            min_10_x = i
+            min_10_y = cost
+        if cost < min_50_y:
+            min_50_x = i
+            min_50_y = cost
+        if cost < min_1000_y:
+            min_1000_x = i
+            min_1000_y = cost
+        if i % 10 == 0:
+            min_10_list_y.append(min_10_y)
+            min_10_list_x.append(min_10_x)
+            min_10_y = math.inf
+        if i % 50 == 0:
+            min_50_list_y.append(min_50_y)
+            min_50_list_x.append(min_50_x)
+            min_50_y = math.inf
+    min_10_list = [min_10_list_x, min_10_list_y]
+    min_50_list = [min_50_list_x, min_50_list_y]
+    min_1000 = [min_1000_x, min_1000_y]
+    return min_10_list, min_50_list, min_1000
+
+
+def plot_data(min_10_list, min_50_list, min_1000, file_name):
+
+    plt.scatter(min_1000[0], min_1000[1], c="red", s=150, label='1000 Minimum')
+
+    plt.scatter(min_50_list[0], min_50_list[1],c="orange", s= 40, label='50 Minimum')
+
+    plt.scatter(min_10_list[0], min_10_list[1], c="blue", s = 8,label='10 Minimum')
+
+    plt.title(file_name)
+
+    plt.legend()
+
+    plt.grid(True)
+    plt.savefig(f"./graphs/min_{file_name}")
+    plt.close()
 
 def minimum_key(key: [int], mst_set: [bool], size: int):
 	min = MAX_WEIGHT
@@ -110,7 +177,6 @@ def convert_MST_to_adjacency_matrix(mst: [[int]]):
 
 	return edges_list
 
-
 def main():
 	for file_name in os.listdir('data'):
 		file_name = file_name[:-4]
@@ -125,6 +191,9 @@ def main():
 
 		weight_tsp = weight_TSP(final_ans, result, len(final_ans))
 		plot_TSP(final_ans, points, file_name, int(weight_tsp))
+
+		min_10_list, min_50_list, min_1000 = get_minimums(result, final_ans)
+		plot_data(min_10_list, min_50_list, min_1000, file_name)
 		final_ans.clear()
 
 if __name__ == '__main__':
