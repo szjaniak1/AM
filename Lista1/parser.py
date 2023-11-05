@@ -29,4 +29,4 @@ def calculate_weight(points: [Point]):
 	return result, points
 
 def get_weight(point1: Point, point2: Point):
-	return sqrt(pow((point1.pos_x - point2.pos_x), 2) + pow((point1.pos_y - point2.pos_y), 2))
+	return round(sqrt(pow((point1.pos_x - point2.pos_x), 2) + pow((point1.pos_y - point2.pos_y), 2)))
