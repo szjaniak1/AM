@@ -1,0 +1,5 @@
+*.zip
+*.log
+*.aux
+*.gz
+*/__pycache__/
