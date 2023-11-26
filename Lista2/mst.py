@@ -52,13 +52,6 @@ def DFS(edges_list: [[int]], num_nodes: int, starting_vertex: int, visited_nodes
 				continue
 			DFS(edges_list, num_nodes, i, visited_nodes)
 
-def weight_MST(parent, graph, size):
-    weight = 0
-    for i in range(1, size):
-    	weight += graph[i][parent[i]]
-
-    return weight
-
 def weight_TSP(tsp, graph, size):
     weight = 0
     for i in range(0, size - 1):
@@ -124,7 +117,6 @@ def invert_weight(permutation, adj_matrix, i, j, weight):
     )
 
 def get_neighbourhood(permutation, adj_matrix, weight):
-
     neighborhood = []
     length = len(permutation)
 
@@ -141,7 +133,7 @@ def local_search(permutation: [int], graph: [[int]], edges_list: [[int]]):
 
 	while True:
 		counter += 1
-		neighbourhood = get_neighbourhood(curr, edges_list, curr_weight)
+		neighbourhood = get_neighbourhood(curr, graph, curr_weight)
 		candidate = min(neighbourhood, key=lambda x: x[2])
 		if candidate[2] >= curr_weight:
 			break
@@ -168,7 +160,6 @@ def main():
 		graph, points = par.parse(f'./data/{file_name}.tsp')
 
 		mst, parent = prim_MST(graph, len(graph))
-		weight = weight_MST(parent, graph, len(graph))
 
 		edges_list = convert_MST_to_adjacency_matrix(mst)
 		n = math.sqrt(len(points) - 1)
@@ -176,6 +167,7 @@ def main():
 		dfs_steps = 0
 		dfs_mean = 0
 		dfs_min = MAX_WEIGHT
+		min_permutation = []
 		print(file_name)
 		for i in range(100):
 			tsp_permutation.clear()
@@ -183,22 +175,21 @@ def main():
 			visited_nodes = [False] * len(mst)
 			DFS(edges_list, len(mst), rand_point, visited_nodes)
 			tsp_permutation.append(rand_point)
-			_p, counter, w = local_search(tsp_permutation, graph, edges_list)
+			p, counter, w = local_search(tsp_permutation, graph, edges_list)
 			print(w)
 			dfs_mean += w
 			dfs_steps += counter
 			if w < dfs_min:
 				dfs_min = w
+				min_permutation = p
+				print(min_permutation)
 
+		plot_TSP(min_permutation, points, file_name + "_loc1", int(dfs_min))
 		print("min")
 		print(dfs_min)
 
 		# weight_tsp = weight_TSP(tsp_permutation, result, len(tsp_permutation))
 		# plot_TSP(tsp_permutation, points, file_name, int(weight_tsp))
-
-		tsp_permutation.clear()
-
-		
 
 if __name__ == '__main__':
     main()
