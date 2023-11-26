@@ -6,9 +6,10 @@ import os
 import math
 from matplotlib import pyplot as plt
 from numpy.random import shuffle
+import numpy.random as random
 
 MAX_WEIGHT = 9999999999
-final_ans = []
+tsp_permutation = []
 
 def get_path_cost(graph, path):
     distance = 0
@@ -18,62 +19,6 @@ def get_path_cost(graph, path):
     distance += graph[path[0]][path[-1]]
 
     return distance
-
-def get_minimums(graph, path):
-    path = path[:-1]
-
-    min_10_list_y = []
-    min_10_list_x = []
-    min_50_list_y = []
-    min_50_list_x = []
-    min_10_x = 0
-    min_10_y = math.inf
-    min_50_x = 0
-    min_50_y = math.inf
-    min_1000_x = 0
-    min_1000_y = math.inf
-    for i in range(1, 1001):
-        shuffle(path)
-
-        cost = get_path_cost(graph, path)
-        if cost < min_10_y:
-            min_10_x = i
-            min_10_y = cost
-        if cost < min_50_y:
-            min_50_x = i
-            min_50_y = cost
-        if cost < min_1000_y:
-            min_1000_x = i
-            min_1000_y = cost
-        if i % 10 == 0:
-            min_10_list_y.append(min_10_y)
-            min_10_list_x.append(min_10_x)
-            min_10_y = math.inf
-        if i % 50 == 0:
-            min_50_list_y.append(min_50_y)
-            min_50_list_x.append(min_50_x)
-            min_50_y = math.inf
-    min_10_list = [min_10_list_x, min_10_list_y]
-    min_50_list = [min_50_list_x, min_50_list_y]
-    min_1000 = [min_1000_x, min_1000_y]
-    return min_10_list, min_50_list, min_1000
-
-
-def plot_data(min_10_list, min_50_list, min_1000, file_name):
-
-    plt.scatter(min_1000[0], min_1000[1], c="red", s=150, label='1000 Minimum')
-
-    plt.scatter(min_50_list[0], min_50_list[1],c="orange", s= 40, label='50 Minimum')
-
-    plt.scatter(min_10_list[0], min_10_list[1], c="blue", s = 8,label='10 Minimum')
-
-    plt.title(file_name)
-
-    plt.legend()
-
-    plt.grid(True)
-    plt.savefig(f"./graphs/min_{file_name}")
-    plt.close()
 
 def minimum_key(key: [int], mst_set: [bool], size: int):
 	min = MAX_WEIGHT
@@ -96,7 +41,7 @@ def MST(parent: [int], size: int):
 	return v
 
 def DFS(edges_list: [[int]], num_nodes: int, starting_vertex: int, visited_nodes: [bool]):
-	final_ans.append(starting_vertex)
+	tsp_permutation.append(starting_vertex)
 	visited_nodes[starting_vertex] = True
 
 	for i in range(num_nodes):
@@ -120,7 +65,6 @@ def weight_TSP(tsp, graph, size):
     	weight += graph[tsp[i]][tsp[i + 1]]
 
     return weight
-
 
 def prim_MST(graph: [[int]], size: int):
 	parent = [0] * size
@@ -166,6 +110,47 @@ def plot_TSP(tsp: [int], points: [par.Point], file_name: str, weight: int):
 	plt.savefig(f'./graphs/TSP_{file_name}')
 	plt.close()
 
+def invert_weight(permutation, adj_matrix, i, j, weight):
+    last = len(permutation) - 1
+    pre = i - 1 if i > 0 else last
+    post = (j + 1) % len(permutation)
+
+    return (
+        weight
+        - adj_matrix[permutation[i]][permutation[pre]]
+        - adj_matrix[permutation[j]][permutation[post]]
+        + adj_matrix[permutation[j]][permutation[pre]]
+        + adj_matrix[permutation[i]][permutation[post]]
+    )
+
+def get_neighbourhood(permutation, adj_matrix, weight):
+
+    neighborhood = []
+    length = len(permutation)
+
+    for diff in range(1, length // 2):
+        for j in range(diff, length):
+            neighborhood.append((j - diff, j, invert_weight(permutation, adj_matrix, j - diff, j, weight)))
+
+    return neighborhood
+
+def local_search(permutation: [int], graph: [[int]], edges_list: [[int]]):
+	curr_weight = weight_TSP(permutation, graph, len(permutation))
+	curr = permutation
+	counter = 0
+
+	while True:
+		counter += 1
+		neighbourhood = get_neighbourhood(curr, edges_list, curr_weight)
+		candidate = min(neighbourhood, key=lambda x: x[2])
+		if candidate[2] >= curr_weight:
+			break
+		start, end, _ = candidate
+		curr[start:end+1] = reversed(curr[start:end + 1])
+		curr_weight = candidate[2]
+
+	return curr, counter, curr_weight
+
 def convert_MST_to_adjacency_matrix(mst: [[int]]):
 	size = len(mst)
 	edges_list = [[0 for i in range(size + 1)] for j in range(size + 1)]
@@ -180,21 +165,38 @@ def convert_MST_to_adjacency_matrix(mst: [[int]]):
 def main():
 	for file_name in os.listdir('data'):
 		file_name = file_name[:-4]
-		result, points = par.parse(f'./data/{file_name}.tsp')
-		mst, parent = prim_MST(result, len(result))
-		weight = weight_MST(parent, result, len(result))
-		plot_MST(mst, points, file_name, int(weight))
+		graph, points = par.parse(f'./data/{file_name}.tsp')
+
+		mst, parent = prim_MST(graph, len(graph))
+		weight = weight_MST(parent, graph, len(graph))
 
 		edges_list = convert_MST_to_adjacency_matrix(mst)
-		visited_nodes = [False] * len(mst)
-		DFS(edges_list, len(mst), 0, visited_nodes)
+		n = math.sqrt(len(points) - 1)
 
-		weight_tsp = weight_TSP(final_ans, result, len(final_ans))
-		plot_TSP(final_ans, points, file_name, int(weight_tsp))
+		dfs_steps = 0
+		dfs_mean = 0
+		dfs_min = MAX_WEIGHT
+		print(file_name)
+		for i in range(100):
+			tsp_permutation.clear()
+			rand_point = random.randint(1, len(points) - 1)
+			visited_nodes = [False] * len(mst)
+			DFS(edges_list, len(mst), rand_point, visited_nodes)
+			tsp_permutation.append(rand_point)
+			_p, counter, w = local_search(tsp_permutation, graph, edges_list)
+			print(w)
+			dfs_mean += w
+			dfs_steps += counter
+			if w < dfs_min:
+				dfs_min = w
 
-		min_10_list, min_50_list, min_1000 = get_minimums(result, final_ans)
-		plot_data(min_10_list, min_50_list, min_1000, file_name)
-		final_ans.clear()
+		print("min")
+		print(dfs_min)
+
+		# weight_tsp = weight_TSP(tsp_permutation, result, len(tsp_permutation))
+		# plot_TSP(tsp_permutation, points, file_name, int(weight_tsp))
+
+		tsp_permutation.clear()
 
 		
 
