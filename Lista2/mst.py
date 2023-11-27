@@ -234,9 +234,15 @@ def main():
 		plot_MST(mst, points, file_name, int(weight_mst))
 		edges_list = convert_MST_to_adjacency_matrix(mst)
 		n = len(points) - 1
+		tsp_permutation = []
+		visited_nodes = [False] * len(mst)
+		DFS(tsp_permutation, len(mst), 0, visited_nodes)
+		tsp_permutation.append(tsp_permutation[0])
+		weight_tsp = weight_TSP(tsp_permutation, graph, len(tsp_permutation))
+		plot_TSP(tsp_permutation, points, file_name, int(weight_tsp))
 
 		file = open("./results/" + file_name + "_result", "w")
-		file.write("mst_weight : " + str(weight_mst) + "\n")
+		file.write("mst_weight : " + str(weight_mst) + "\ntsp_weight : " + str(weight_tsp) + "\n")
 		file.close()
 
 		t1 = Process(target=local1, args=(file_name, n, graph, edges_list, points, len(mst)))
