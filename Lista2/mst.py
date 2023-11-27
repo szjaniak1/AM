@@ -59,6 +59,13 @@ def weight_TSP(tsp, graph, size):
 
     return weight
 
+def weight_MST(parent, graph, size):
+    weight = 0
+    for i in range(1, size):
+    	weight += graph[i][parent[i]]
+
+    return weight
+
 def prim_MST(graph: [[int]], size: int):
 	parent = [0] * size
 	key = [MAX_WEIGHT] * size
@@ -128,7 +135,7 @@ def get_neighbourhood(permutation, adj_matrix, weight):
 
 def local_search(permutation: [int], graph: [[int]], edges_list: [[int]]):
 	curr_weight = weight_TSP(permutation, graph, len(permutation))
-	curr = permutation
+	curr = permutation.copy()
 	counter = 0
 
 	while True:
@@ -158,9 +165,11 @@ def do_the_thing(file_name: str):
 	graph, points = par.parse(f'./data/{file_name}.tsp')
 
 	mst, parent = prim_MST(graph, len(graph))
-
+	weight_mst = weight_MST(parent, graph, len(graph))
+	plot_MST(mst, points, file_name, int(weight_mst))
 	edges_list = convert_MST_to_adjacency_matrix(mst)
-	n = math.sqrt(len(points) - 1)
+	n = len(points) - 1
+	n_root = math.sqrt(n)
 
 	dfs_steps = 0
 	dfs_mean = 0
@@ -169,7 +178,7 @@ def do_the_thing(file_name: str):
 	tsp_permutation = []
 
 	print(file_name)
-	for i in range(int(n)):
+	for i in range(int(n_root)):
 		tsp_permutation.clear()
 		rand_point = random.randint(1, len(points) - 1)
 		visited_nodes = [False] * len(mst)
@@ -183,54 +192,51 @@ def do_the_thing(file_name: str):
 			dfs_min = w
 			min_permutation = p
 
+	f = open("./results/" + file_name + "_result", "w")
+	f.write("mst_weight : " + str(weight_mst) + "\n")
+	f.write("loc1\n")
+	f.write("counter : " + str(dfs_steps / n) + "\n")
+	f.write("mean_result : " + str(dfs_mean / n) + "\n")
+	f.write("min_result : " + str(dfs_min) + "\n")
+
 	plot_TSP(min_permutation, points, file_name + "_loc1", int(dfs_min))
-	print("min")
+	print("min_" + str(file_name))
 	print(dfs_min)
 
-	# weight_tsp = weight_TSP(tsp_permutation, result, len(tsp_permutation))
-	# plot_TSP(tsp_permutation, points, file_name, int(weight_tsp))
+	dfs_steps = 0
+	dfs_mean = 0
+	dfs_min = MAX_WEIGHT
+
+	print(file_name)
+	for i in range(int(n_root)):
+		visited_nodes = [False] * len(mst)
+		tsp_permutation = list(random.permutation(n))
+		tsp_permutation.append(tsp_permutation[0])
+		p, counter, w = local_search(tsp_permutation, graph, edges_list)
+		print(w)
+		dfs_mean += w
+		dfs_steps += counter
+		if w < dfs_min:
+			dfs_min = w
+			min_permutation = p
+
+	f.write("loc2\n")
+	f.write("counter : " + str(dfs_steps / n) + "\n")
+	f.write("mean_result : " + str(dfs_mean / n) + "\n")
+	f.write("min_result : " + str(dfs_min) + "\n")
+
+	f.close()
+
+	plot_TSP(min_permutation, points, file_name + "_loc2", int(dfs_min))
+	print("min_" + str(file_name))
+	print(dfs_min)
 
 def main():
-	for file_name in os.listdir('data'):
-		file_name = file_name[:-4]
-		t = Process(target=do_the_thing, args=(file_name,))
-		t.start()
-
-		# graph, points = par.parse(f'./data/{file_name}.tsp')
-
-		# mst, parent = prim_MST(graph, len(graph))
-
-		# edges_list = convert_MST_to_adjacency_matrix(mst)
-		# n = math.sqrt(len(points) - 1)
-
-		# dfs_steps = 0
-		# dfs_mean = 0
-		# dfs_min = MAX_WEIGHT
-		# min_permutation = []
-		# tsp_permutation = []
-
-		# print(file_name)
-		# for i in range(int(n)):
-		# 	tsp_permutation.clear()
-		# 	rand_point = random.randint(1, len(points) - 1)
-		# 	visited_nodes = [False] * len(mst)
-		# 	DFS(tsp_permutation, edges_list, len(mst), rand_point, visited_nodes)
-		# 	tsp_permutation.append(rand_point)
-		# 	p, counter, w = local_search(tsp_permutation, graph, edges_list)
-		# 	print(w)
-		# 	dfs_mean += w
-		# 	dfs_steps += counter
-		# 	if w < dfs_min:
-		# 		dfs_min = w
-		# 		min_permutation = p
-		# 		print(min_permutation)
-
-		# plot_TSP(min_permutation, points, file_name + "_loc1", int(dfs_min))
-		# print("min")
-		# print(dfs_min)
-
-		# weight_tsp = weight_TSP(tsp_permutation, result, len(tsp_permutation))
-		# plot_TSP(tsp_permutation, points, file_name, int(weight_tsp))
+	do_the_thing("xqf131")
+	# for file_name in os.listdir('data'):
+	# 	file_name = file_name[:-4]
+		# t = Process(target=do_the_thing, args=(file_name,))
+		# t.start()
 
 if __name__ == '__main__':
     main()
