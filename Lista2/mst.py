@@ -133,6 +133,20 @@ def get_neighbourhood(permutation, adj_matrix, weight):
 
     return neighborhood
 
+
+def get_faster_neighbourhood(permutation, adj_matrix):
+    neighborhood = []
+    length = len(permutation)
+    weight = weight_TSP(permutation, adj_matrix, len(permutation))
+    candidates = [(j - diff, j) for diff in range(1, length // 2) for j in range(diff, length)]
+    
+    random.shuffle(candidates)
+    
+    for i, j in candidates:
+        neighborhood.append((i, j, invert_weight(permutation, adj_matrix, i, j, weight)))
+
+    return neighborhood
+
 def local_search(permutation: [int], graph: [[int]]):
 	curr_weight = weight_TSP(permutation, graph, len(permutation))
 	curr = permutation.copy()
@@ -141,6 +155,23 @@ def local_search(permutation: [int], graph: [[int]]):
 	while True:
 		counter += 1
 		neighbourhood = get_neighbourhood(curr, graph, curr_weight)
+		candidate = min(neighbourhood, key=lambda x: x[2])
+		if candidate[2] >= curr_weight:
+			break
+		start, end, _ = candidate
+		curr[start:end+1] = reversed(curr[start:end + 1])
+		curr_weight = candidate[2]
+
+	return curr, counter, curr_weight
+
+def faster_local_search(permutation: [int], graph: [[int]]):
+	curr_weight = weight_TSP(permutation, graph, len(permutation))
+	curr = permutation.copy()
+	counter = 0
+
+	while True:
+		counter += 1
+		neighbourhood = get_faster_neighbourhood(curr, graph)
 		candidate = min(neighbourhood, key=lambda x: x[2])
 		if candidate[2] >= curr_weight:
 			break
@@ -222,6 +253,35 @@ def local2(data_name: str, n: int, graph: [[int]], points: [par.Point], mst_len:
 	print("min_" + str(data_name))
 	print(dfs_min)
 
+def local3(data_name: str, n: int, graph: [[int]], points: [par.Point], mst_len: int):
+	n_root = math.sqrt(n)
+	dfs_steps = 0
+	dfs_mean = 0
+	dfs_min = MAX_WEIGHT
+
+	print(data_name)
+	min_permutation = []
+	n_root = math.sqrt(n)
+	for i in range(int(n_root)):
+		visited_nodes = [False] * mst_len
+		tsp_permutation = list(random.permutation(n))
+		tsp_permutation.append(tsp_permutation[0])
+		p, counter, w = faster_local_search(tsp_permutation, graph)
+		print(w)
+		dfs_mean += w
+		dfs_steps += counter
+		if w < dfs_min:
+			dfs_min = w
+			min_permutation = p
+
+	result_file = open("./results/" + data_name + "_result", "a")
+	result_file.write("loc3\ncounter : " + str(dfs_steps / n) + "\nmean_result : " + str(dfs_mean / n) + "\nmin_result : " + str(dfs_min) + "\n")
+	result_file.close()
+
+	plot_TSP(min_permutation, points, data_name + "_loc3", int(dfs_min))
+	print("min_" + str(data_name))
+	print(dfs_min)
+
 
 def main():
 	for file_name in os.listdir('data'):
@@ -236,7 +296,7 @@ def main():
 		n = len(points) - 1
 		tsp_permutation = []
 		visited_nodes = [False] * len(mst)
-		DFS(tsp_permutation, len(mst), 0, visited_nodes)
+		DFS(tsp_permutation, edges_list, len(mst), 0, visited_nodes)
 		tsp_permutation.append(tsp_permutation[0])
 		weight_tsp = weight_TSP(tsp_permutation, graph, len(tsp_permutation))
 		plot_TSP(tsp_permutation, points, file_name, int(weight_tsp))
@@ -245,10 +305,12 @@ def main():
 		file.write("mst_weight : " + str(weight_mst) + "\ntsp_weight : " + str(weight_tsp) + "\n")
 		file.close()
 
-		t1 = Process(target=local1, args=(file_name, n, graph, edges_list, points, len(mst)))
-		t2 = Process(target=local2, args=(file_name, n, graph, points, len(mst)))
-		t1.start()
-		t2.start()
+		# t1 = Process(target=local1, args=(file_name, n, graph, edges_list, points, len(mst)))
+		# t2 = Process(target=local2, args=(file_name, n, graph, points, len(mst)))
+		t3 = Process(target=local3, args=(file_name, n, graph, points, len(mst)))
+		# t1.start()
+		# t2.start()
+		t3.start()
 
 if __name__ == '__main__':
     main()
