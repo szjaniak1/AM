@@ -7,9 +7,9 @@ import math
 from matplotlib import pyplot as plt
 from numpy.random import shuffle
 import numpy.random as random
+from multiprocessing import Process
 
 MAX_WEIGHT = 9999999999
-tsp_permutation = []
 
 def get_path_cost(graph, path):
     distance = 0
@@ -40,7 +40,7 @@ def MST(parent: [int], size: int):
 
 	return v
 
-def DFS(edges_list: [[int]], num_nodes: int, starting_vertex: int, visited_nodes: [bool]):
+def DFS(tsp_permutation: [int], edges_list: [[int]], num_nodes: int, starting_vertex: int, visited_nodes: [bool]):
 	tsp_permutation.append(starting_vertex)
 	visited_nodes[starting_vertex] = True
 
@@ -50,7 +50,7 @@ def DFS(edges_list: [[int]], num_nodes: int, starting_vertex: int, visited_nodes
 		if edges_list[starting_vertex][i] == 1:
 			if visited_nodes[i]:
 				continue
-			DFS(edges_list, num_nodes, i, visited_nodes)
+			DFS(tsp_permutation, edges_list, num_nodes, i, visited_nodes)
 
 def weight_TSP(tsp, graph, size):
     weight = 0
@@ -154,39 +154,80 @@ def convert_MST_to_adjacency_matrix(mst: [[int]]):
 
 	return edges_list
 
+def do_the_thing(file_name: str):
+	graph, points = par.parse(f'./data/{file_name}.tsp')
+
+	mst, parent = prim_MST(graph, len(graph))
+
+	edges_list = convert_MST_to_adjacency_matrix(mst)
+	n = math.sqrt(len(points) - 1)
+
+	dfs_steps = 0
+	dfs_mean = 0
+	dfs_min = MAX_WEIGHT
+	min_permutation = []
+	tsp_permutation = []
+
+	print(file_name)
+	for i in range(int(n)):
+		tsp_permutation.clear()
+		rand_point = random.randint(1, len(points) - 1)
+		visited_nodes = [False] * len(mst)
+		DFS(tsp_permutation, edges_list, len(mst), rand_point, visited_nodes)
+		tsp_permutation.append(rand_point)
+		p, counter, w = local_search(tsp_permutation, graph, edges_list)
+		print(w)
+		dfs_mean += w
+		dfs_steps += counter
+		if w < dfs_min:
+			dfs_min = w
+			min_permutation = p
+
+	plot_TSP(min_permutation, points, file_name + "_loc1", int(dfs_min))
+	print("min")
+	print(dfs_min)
+
+	# weight_tsp = weight_TSP(tsp_permutation, result, len(tsp_permutation))
+	# plot_TSP(tsp_permutation, points, file_name, int(weight_tsp))
+
 def main():
 	for file_name in os.listdir('data'):
 		file_name = file_name[:-4]
-		graph, points = par.parse(f'./data/{file_name}.tsp')
+		t = Process(target=do_the_thing, args=(file_name,))
+		t.start()
 
-		mst, parent = prim_MST(graph, len(graph))
+		# graph, points = par.parse(f'./data/{file_name}.tsp')
 
-		edges_list = convert_MST_to_adjacency_matrix(mst)
-		n = math.sqrt(len(points) - 1)
+		# mst, parent = prim_MST(graph, len(graph))
 
-		dfs_steps = 0
-		dfs_mean = 0
-		dfs_min = MAX_WEIGHT
-		min_permutation = []
-		print(file_name)
-		for i in range(100):
-			tsp_permutation.clear()
-			rand_point = random.randint(1, len(points) - 1)
-			visited_nodes = [False] * len(mst)
-			DFS(edges_list, len(mst), rand_point, visited_nodes)
-			tsp_permutation.append(rand_point)
-			p, counter, w = local_search(tsp_permutation, graph, edges_list)
-			print(w)
-			dfs_mean += w
-			dfs_steps += counter
-			if w < dfs_min:
-				dfs_min = w
-				min_permutation = p
-				print(min_permutation)
+		# edges_list = convert_MST_to_adjacency_matrix(mst)
+		# n = math.sqrt(len(points) - 1)
 
-		plot_TSP(min_permutation, points, file_name + "_loc1", int(dfs_min))
-		print("min")
-		print(dfs_min)
+		# dfs_steps = 0
+		# dfs_mean = 0
+		# dfs_min = MAX_WEIGHT
+		# min_permutation = []
+		# tsp_permutation = []
+
+		# print(file_name)
+		# for i in range(int(n)):
+		# 	tsp_permutation.clear()
+		# 	rand_point = random.randint(1, len(points) - 1)
+		# 	visited_nodes = [False] * len(mst)
+		# 	DFS(tsp_permutation, edges_list, len(mst), rand_point, visited_nodes)
+		# 	tsp_permutation.append(rand_point)
+		# 	p, counter, w = local_search(tsp_permutation, graph, edges_list)
+		# 	print(w)
+		# 	dfs_mean += w
+		# 	dfs_steps += counter
+		# 	if w < dfs_min:
+		# 		dfs_min = w
+		# 		min_permutation = p
+		# 		print(min_permutation)
+
+		# plot_TSP(min_permutation, points, file_name + "_loc1", int(dfs_min))
+		# print("min")
+		# print(dfs_min)
 
 		# weight_tsp = weight_TSP(tsp_permutation, result, len(tsp_permutation))
 		# plot_TSP(tsp_permutation, points, file_name, int(weight_tsp))
