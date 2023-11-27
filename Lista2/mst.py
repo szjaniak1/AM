@@ -305,11 +305,11 @@ def main():
 		file.write("mst_weight : " + str(weight_mst) + "\ntsp_weight : " + str(weight_tsp) + "\n")
 		file.close()
 
-		# t1 = Process(target=local1, args=(file_name, n, graph, edges_list, points, len(mst)))
-		# t2 = Process(target=local2, args=(file_name, n, graph, points, len(mst)))
+		t1 = Process(target=local1, args=(file_name, n, graph, edges_list, points, len(mst)))
+		t2 = Process(target=local2, args=(file_name, n, graph, points, len(mst)))
 		t3 = Process(target=local3, args=(file_name, n, graph, points, len(mst)))
-		# t1.start()
-		# t2.start()
+		t1.start()
+		t2.start()
 		t3.start()
 
 if __name__ == '__main__':
