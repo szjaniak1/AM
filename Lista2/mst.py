@@ -133,7 +133,7 @@ def get_neighbourhood(permutation, adj_matrix, weight):
 
     return neighborhood
 
-def local_search(permutation: [int], graph: [[int]], edges_list: [[int]]):
+def local_search(permutation: [int], graph: [[int]]):
 	curr_weight = weight_TSP(permutation, graph, len(permutation))
 	curr = permutation.copy()
 	counter = 0
@@ -161,30 +161,22 @@ def convert_MST_to_adjacency_matrix(mst: [[int]]):
 
 	return edges_list
 
-def do_the_thing(file_name: str):
-	graph, points = par.parse(f'./data/{file_name}.tsp')
-
-	mst, parent = prim_MST(graph, len(graph))
-	weight_mst = weight_MST(parent, graph, len(graph))
-	plot_MST(mst, points, file_name, int(weight_mst))
-	edges_list = convert_MST_to_adjacency_matrix(mst)
-	n = len(points) - 1
-	n_root = math.sqrt(n)
-
+def local1(data_name: str, n: int, graph: [[int]], edges_list: [[int]], points: [par.Point], mst_len: int):
 	dfs_steps = 0
 	dfs_mean = 0
 	dfs_min = MAX_WEIGHT
 	min_permutation = []
 	tsp_permutation = []
 
-	print(file_name)
+	print(data_name)
+	n_root = math.sqrt(n)
 	for i in range(int(n_root)):
 		tsp_permutation.clear()
 		rand_point = random.randint(1, len(points) - 1)
-		visited_nodes = [False] * len(mst)
-		DFS(tsp_permutation, edges_list, len(mst), rand_point, visited_nodes)
+		visited_nodes = [False] * mst_len
+		DFS(tsp_permutation, edges_list, mst_len, rand_point, visited_nodes)
 		tsp_permutation.append(rand_point)
-		p, counter, w = local_search(tsp_permutation, graph, edges_list)
+		p, counter, w = local_search(tsp_permutation, graph)
 		print(w)
 		dfs_mean += w
 		dfs_steps += counter
@@ -192,27 +184,29 @@ def do_the_thing(file_name: str):
 			dfs_min = w
 			min_permutation = p
 
-	f = open("./results/" + file_name + "_result", "w")
-	f.write("mst_weight : " + str(weight_mst) + "\n")
-	f.write("loc1\n")
-	f.write("counter : " + str(dfs_steps / n) + "\n")
-	f.write("mean_result : " + str(dfs_mean / n) + "\n")
-	f.write("min_result : " + str(dfs_min) + "\n")
+	result_file = open("./results/" + data_name + "_result", "a")
+	result_file.write("loc1\ncounter : " + str(dfs_steps / n) + "\nmean_result : " + str(dfs_mean / n) + "\nmin_result : " + str(dfs_min) + "\n")
+	result_file.close()
 
-	plot_TSP(min_permutation, points, file_name + "_loc1", int(dfs_min))
-	print("min_" + str(file_name))
+	plot_TSP(min_permutation, points, data_name + "_loc1", int(dfs_min))
+	print("min_" + str(data_name))
 	print(dfs_min)
 
+	
+def local2(data_name: str, n: int, graph: [[int]], points: [par.Point], mst_len: int):
+	n_root = math.sqrt(n)
 	dfs_steps = 0
 	dfs_mean = 0
 	dfs_min = MAX_WEIGHT
 
-	print(file_name)
+	print(data_name)
+	min_permutation = []
+	n_root = math.sqrt(n)
 	for i in range(int(n_root)):
-		visited_nodes = [False] * len(mst)
+		visited_nodes = [False] * mst_len
 		tsp_permutation = list(random.permutation(n))
 		tsp_permutation.append(tsp_permutation[0])
-		p, counter, w = local_search(tsp_permutation, graph, edges_list)
+		p, counter, w = local_search(tsp_permutation, graph)
 		print(w)
 		dfs_mean += w
 		dfs_steps += counter
@@ -220,23 +214,35 @@ def do_the_thing(file_name: str):
 			dfs_min = w
 			min_permutation = p
 
-	f.write("loc2\n")
-	f.write("counter : " + str(dfs_steps / n) + "\n")
-	f.write("mean_result : " + str(dfs_mean / n) + "\n")
-	f.write("min_result : " + str(dfs_min) + "\n")
+	result_file = open("./results/" + data_name + "_result", "a")
+	result_file.write("loc2\ncounter : " + str(dfs_steps / n) + "\nmean_result : " + str(dfs_mean / n) + "\nmin_result : " + str(dfs_min) + "\n")
+	result_file.close()
 
-	f.close()
-
-	plot_TSP(min_permutation, points, file_name + "_loc2", int(dfs_min))
-	print("min_" + str(file_name))
+	plot_TSP(min_permutation, points, data_name + "_loc2", int(dfs_min))
+	print("min_" + str(data_name))
 	print(dfs_min)
 
+
 def main():
-	do_the_thing("xqf131")
-	# for file_name in os.listdir('data'):
-	# 	file_name = file_name[:-4]
-		# t = Process(target=do_the_thing, args=(file_name,))
-		# t.start()
+	for file_name in os.listdir('data'):
+		file_name = file_name[:-4]
+
+		graph, points = par.parse(f'./data/{file_name}.tsp')
+
+		mst, parent = prim_MST(graph, len(graph))
+		weight_mst = weight_MST(parent, graph, len(graph))
+		plot_MST(mst, points, file_name, int(weight_mst))
+		edges_list = convert_MST_to_adjacency_matrix(mst)
+		n = len(points) - 1
+
+		file = open("./results/" + file_name + "_result", "w")
+		file.write("mst_weight : " + str(weight_mst) + "\n")
+		file.close()
+
+		t1 = Process(target=local1, args=(file_name, n, graph, edges_list, points, len(mst)))
+		t2 = Process(target=local2, args=(file_name, n, graph, points, len(mst)))
+		t1.start()
+		t2.start()
 
 if __name__ == '__main__':
     main()

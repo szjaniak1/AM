@@ -1,9 +1,9 @@
 mst_weight : 476
 loc1
-counter : 2.16793893129771
-mean_result : 47.45038167938932
-min_result : 536
+ counter : 2.1068702290076335
+mean_result : 46.595419847328245
+min_result : 531
 loc2
-counter : 11.030534351145038
-mean_result : 51.25954198473283
-min_result : 558
+ counter : 11.320610687022901
+mean_result : 52.97709923664122
+min_result : 592
