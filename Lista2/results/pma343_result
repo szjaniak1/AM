@@ -1,6 +1,14 @@
 mst_weight : 1183
 tsp_weight : 1810
+loc1
+counter : 2.947521865889213
+mean_result : 78.14868804664724
+min_result : 1476
+loc2
+counter : 20.73177842565598
+mean_result : 89.6938775510204
+min_result : 1524
 loc3
-counter : 20.8600583090379
-mean_result : 88.43148688046647
-min_result : 1506
+counter : 20.871720116618075
+mean_result : 90.15743440233236
+min_result : 1585
