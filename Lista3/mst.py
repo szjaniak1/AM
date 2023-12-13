@@ -101,9 +101,7 @@ def simulated_annealing(adj_matrix, temperature):
             if potential_weight < current_weight:
                 current_weight = potential_weight
                 solution = potential_solution
-            elif random.random() < math.exp(
-                (current_weight - potential_weight) / temperature
-            ):
+            elif random.random() < math.exp((current_weight - potential_weight) / temperature):
                 current_weight = potential_weight
                 solution = potential_solution
 
@@ -117,8 +115,9 @@ def main():
 
 		graph, points, points_count = par.parse(f'./data/{file_name}.tsp')
 		adj_matrix = points_to_matrix(points)
-		sa = simulated_annealing(adj_matrix, points_count)
+		sa, best_weight = simulated_annealing(adj_matrix, points_count)
 		print(sa)
+		print(best_weight)
 
 if __name__ == '__main__':
     main()
