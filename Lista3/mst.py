@@ -12,6 +12,86 @@ from multiprocessing import Process
 from matplotlib import pyplot as plt
 from numpy.random import shuffle
 
+MAX_WEIGHT = 9999999999
+
+def get_path_cost(graph, path):
+    distance = 0
+    for i in range(len(path) - 1):
+        distance += graph[path[i]][path[i+1]]
+
+    distance += graph[path[0]][path[-1]]
+
+    return distance
+
+def minimum_key(key: [int], mst_set: [bool], size: int):
+    min = MAX_WEIGHT
+    min_index = 0
+    for v in range(0, size):
+        if mst_set[v] == False and key[v] < min:
+            min = key[v]
+            min_index = v;
+
+    return min_index
+
+def MST(parent: [int], size: int):
+    v = []
+    for i in range(1, size):
+        p = []
+        p.append(parent[i])
+        p.append(i)
+        v.append(p)
+
+    return v
+
+def weight_MST(parent, graph, size):
+    weight = 0
+    for i in range(1, size):
+        weight += graph[i][parent[i]]
+
+    return weight
+
+def DFS(tsp_permutation: [int], edges_list: [[int]], num_nodes: int, starting_vertex: int, visited_nodes: [bool]):
+    tsp_permutation.append(starting_vertex)
+    visited_nodes[starting_vertex] = True
+
+    for i in range(num_nodes):
+        if i == starting_vertex:
+            continue
+        if edges_list[starting_vertex][i] == 1:
+            if visited_nodes[i]:
+                continue
+            DFS(tsp_permutation, edges_list, num_nodes, i, visited_nodes)
+
+def convert_MST_to_adjacency_matrix(mst: [[int]]):
+    size = len(mst)
+    edges_list = [[0 for i in range(size + 1)] for j in range(size + 1)]
+    for i in range(size):
+        first_node = mst[i][0]
+        second_node = mst[i][1]
+        edges_list[first_node][second_node] = 1
+        edges_list[second_node][first_node] = 1
+
+    return edges_list
+
+def prim_MST(graph: [[int]], size: int):
+    parent = [0] * size
+    key = [MAX_WEIGHT] * size
+    mst_set = [False] * size
+
+    key[0] = 0
+    parent[0] = -1
+
+    for count in range(0, size - 1):
+        u = minimum_key(key, mst_set, size)
+        mst_set[u] = True
+        for v in range(0, size):
+            if graph[u][v] > 0 and mst_set[v] == False and graph[u][v] < key[v]:
+                parent[v] = u
+                key[v] = graph[u][v]
+
+    mst = MST(parent, size)
+    return mst, parent
+
 def permutation_weight(permutation: [int], adj_matrix: [[int]]):
     s = 0
     prev = permutation[0]
@@ -75,14 +155,16 @@ def points_to_matrix(points: [[int]]):
 
     return adj_matrix
 
-def simulated_annealing(adj_matrix, temperature):
+def simulated_annealing(adj_matrix, alpha, beta, gamma, delta):
     point_count = len(adj_matrix)
+    temperature = int(point_count * alpha)
+    _epoch_range = int(temperature * delta)
+    max_iterations = int(point_count * gamma)
     solution = get_random_permutation(point_count)
     current_weight = permutation_weight(solution, adj_matrix)
-    print("SEED SOLUTION:", current_weight)
 
-    while temperature != 0:
-        for _epoch in range(10_000):
+    for i in range(max_iterations):
+        for _epoch in range(_epoch_range):
             swap_idx = random.sample(range(point_count), 2)
             potential_solution = solution[:]
             potential_solution[swap_idx[0]], potential_solution[swap_idx[1]] = (
@@ -98,15 +180,15 @@ def simulated_annealing(adj_matrix, temperature):
                 current_weight = potential_weight
                 solution = potential_solution
 
-        temperature -= 1
+        temperature *= beta
 
     return solution, current_weight
 
-def tabu_search(adj_matrix):
-    tabu_list_size = len(adj_matrix)
-    max_iterations = 200
+def tabu_search(initial_solution, adj_matrix, alpha, beta):
+    point_count = len(adj_matrix)
+    tabu_list_size = int(point_count * alpha)
+    max_iterations = int(point_count * beta)
 
-    initial_solution = get_random_permutation(tabu_list_size)
     best_solution = initial_solution
     current_solution = initial_solution
     tabu_list = []
@@ -137,27 +219,30 @@ def tabu_search(adj_matrix):
     return best_solution, permutation_weight(best_solution, adj_matrix)
 
 def main():
-    file_name = "xqf131"
-    raph, points, points_count = par.parse(f'./data/{file_name}.tsp')
-    adj_matrix = points_to_matrix(points)
-    sa, best_weight = simulated_annealing(adj_matrix, points_count)
-    print(best_weight)
+    for file_name in os.listdir('data'):
+        file_name = file_name[:-4]
 
-    tabu, best_weight = tabu_search(adj_matrix)
-    print(best_weight)
+        graph, points, points_count = par.parse(f'./data/{file_name}.tsp')
+        adj_matrix = points_to_matrix(points)
 
-    # for file_name in os.listdir('data'):
-    #     file_name = file_name[:-4]
+        mst, parent = prim_MST(graph, len(graph))
+        weight_mst = weight_MST(parent, graph, len(graph))
+        edges_list = convert_MST_to_adjacency_matrix(mst)
+        n = len(points) - 1
+        tsp_permutation = []
+        visited_nodes = [False] * len(mst)
+        DFS(tsp_permutation, edges_list, len(mst), 0, visited_nodes)
+        tsp_permutation.append(tsp_permutation[0])
 
-    #     graph, points, points_count = par.parse(f'./data/{file_name}.tsp')
-    #     adj_matrix = points_to_matrix(points)
-    #     # sa, best_weight = simulated_annealing(adj_matrix, points_count)
-    #     # print(sa)
-    #     # print(best_weight)
+        # result_file = open("./results/" + data_name + "_result", "a")
+        # result_file.write("loc1\ncounter : " + str(dfs_steps / n) + "\nmean_result : " + str(dfs_mean / n) + "\nmin_result : " + str(dfs_min) + "\n")
+        # result_file.close()
 
-    #     tabu, best_weight = tabu_search(adj_matrix)
-    #     print(tabu)
-    #     print(best_weight)
+        sa, best_weight = simulated_annealing(adj_matrix, alpha=0.5, beta=0.95, delta=0.2, gamma=0.1)
+        print(best_weight)
+
+        tabu, best_weight = tabu_search(tsp_permutation, adj_matrix, alpha=0.1, beta=0.2)
+        print(best_weight)
 
 if __name__ == '__main__':
     main()
