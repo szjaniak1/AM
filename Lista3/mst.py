@@ -50,23 +50,6 @@ def get_neighbourhood(permutation, adj_matrix, weight):
 
     return neighborhood
 
-def local_search(permutation: [int], graph: [[int]]):
-	curr_weight = weight_TSP(permutation, graph, len(permutation))
-	curr = permutation.copy()
-	counter = 0
-
-	while True:
-		counter += 1
-		neighbourhood = get_neighbourhood(curr, graph, curr_weight)
-		candidate = min(neighbourhood, key=lambda x: x[2])
-		if candidate[2] >= curr_weight:
-			break
-		start, end, _ = candidate
-		curr[start:end+1] = reversed(curr[start:end + 1])
-		curr_weight = candidate[2]
-
-	return curr, counter, curr_weight
-
 def points_to_matrix(points: [[int]]):
     point_count = len(points)
     adj_matrix = [[0] * point_count for _ in range(point_count)]
