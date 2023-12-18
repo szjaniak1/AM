@@ -3,3 +3,4 @@
 *.aux
 *.gz
 */__pycache__/
+/Lista3/results

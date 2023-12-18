@@ -221,6 +221,7 @@ def tabu_search(initial_solution, adj_matrix, alpha, beta):
 def main():
     for file_name in os.listdir('data'):
         file_name = file_name[:-4]
+        print(file_name)
 
         graph, points, points_count = par.parse(f'./data/{file_name}.tsp')
         adj_matrix = points_to_matrix(points)
@@ -234,15 +235,15 @@ def main():
         DFS(tsp_permutation, edges_list, len(mst), 0, visited_nodes)
         tsp_permutation.append(tsp_permutation[0])
 
-        # result_file = open("./results/" + data_name + "_result", "a")
-        # result_file.write("loc1\ncounter : " + str(dfs_steps / n) + "\nmean_result : " + str(dfs_mean / n) + "\nmin_result : " + str(dfs_min) + "\n")
-        # result_file.close()
+        sa, sa_best_weight = simulated_annealing(adj_matrix, alpha=0.5, beta=0.95, delta=0.3, gamma=0.3)
+        print(sa_best_weight)
 
-        sa, best_weight = simulated_annealing(adj_matrix, alpha=0.5, beta=0.95, delta=0.2, gamma=0.1)
-        print(best_weight)
+        tabu, tabu_best_weight = tabu_search(tsp_permutation, adj_matrix, alpha=0.1, beta=0.2)
+        print(tabu_best_weight)
 
-        tabu, best_weight = tabu_search(tsp_permutation, adj_matrix, alpha=0.1, beta=0.2)
-        print(best_weight)
+        result_file = open("./results/" + file_name + "_result", "a")
+        result_file.write("\nsimulated_annealing : " + str(sa_best_weight) + "\ntabu_search : " + str(tabu_best_weight) + "\n")
+        result_file.close()
 
 if __name__ == '__main__':
     main()
