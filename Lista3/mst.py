@@ -123,6 +123,7 @@ def get_neighbors(solution):
     for i in range(len(solution)):
         for j in range(i + 1, len(solution)):
             neighbor = solution[:]
+            i, j = np.random.choice(len(solution), size=2, replace=False)
             neighbor[i], neighbor[j] = neighbor[j], neighbor[i]
             neighbors.append(neighbor)
     return neighbors
@@ -204,6 +205,7 @@ def tabu_search(initial_solution, adj_matrix, alpha, beta):
  
         current_solution = best_neighbor
         tabu_list.append(best_neighbor)
+
         if len(tabu_list) > tabu_list_size:
             tabu_list.pop(0)
  

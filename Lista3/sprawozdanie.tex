@@ -37,6 +37,29 @@
 \subsection*{Wnioski}
 	Widzimy, że bazowanie na MST znacząco poprawia jakość rozwiązań już dla bardzo małych danych. Dysproporcja zwiększa się wraz ze zwiększaniem ilości wierzchołków.
 
+\subsection*{Dobór parametrów}
+	\begin{itemize}
+		\item N - liczba wierzchołków
+	\end{itemize}
+\subsubsection*{Tabu Search}
+	\begin{itemize}
+		\item Temperatura początkowa: $initial\_temp = N \cdot \alpha$, $\alpha = 0.85$
+		\item Chłodzenie: $temp = temp \cdot \beta $, $\beta = 0.85$
+		\item Długość epoki: $epoch\_range = initial\_temp \cdot \delta = 0.7$
+		\item Liczba iteracji: $max\_it = N \cdot \delta$, $\gamma = 0.7$
+		\item Typ otoczenia: \texttt{SWAP}
+		\item Rozwiązanie początkowe: oparte o MST
+	\end{itemize}
+
+\subsubsection*{Symulowane wyżarzanie}
+	\begin{itemize}
+		\item Długość listy tabu: $t\_size = N \cdot \alpha$, $ \alpha = 0.1$
+		\item Liczba iteracji: $max\_it = N \cdot \beta$, $\beta = 0.2$
+		\item Typ otoczenia: \texttt{SWAP}
+		\item Wybór otoczenia: pełne
+		\item Rozwiązanie początkowe: oparte o MST
+	\end{itemize}
+
 \begin{table}[h!]
     \centering
     \begin{tabular}{|c|c|c|c|c|c|c|}
