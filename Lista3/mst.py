@@ -102,34 +102,21 @@ def permutation_weight(permutation: [int], adj_matrix: [[int]]):
     s += adj_matrix[0][-1]
     return s
 
+def calculate_total_distance(order, distance_matrix):
+    total_distance = 0
+    num_cities = len(order)
+    
+    for i in range(num_cities - 1):
+        city1, city2 = order[i], order[i + 1]
+        total_distance += distance_matrix[city1][city2]
+    
+    total_distance += distance_matrix[order[-1]][order[0]]  # Return to the starting city
+    return total_distance
+
 def get_random_permutation(point_count: int):
     permutation = list(range(point_count))
     rand.shuffle(permutation)
     return permutation
-
-def invert_weight(permutation, adj_matrix, i, j, weight):
-    last = len(permutation) - 1
-    pre = i - 1 if i > 0 else last
-    post = (j + 1) % len(permutation)
-
-    return (
-        weight
-        - adj_matrix[permutation[i]][permutation[pre]]
-        - adj_matrix[permutation[j]][permutation[post]]
-        + adj_matrix[permutation[j]][permutation[pre]]
-        + adj_matrix[permutation[i]][permutation[post]]
-    )
-
-def get_neighbourhood(permutation, adj_matrix):
-    weight = permutation_weight(permutation, adj_matrix)
-    neighborhood = []
-    length = len(permutation)
-
-    for diff in range(1, length // 2):
-        for j in range(diff, length):
-            neighborhood.append((j - diff, j, invert_weight(permutation, adj_matrix, j - diff, j, weight)))
-
-    return neighborhood
 
 def get_neighbors(solution):
     neighbors = []
@@ -155,34 +142,41 @@ def points_to_matrix(points: [[int]]):
 
     return adj_matrix
 
-def simulated_annealing(adj_matrix, alpha, beta, gamma, delta):
+def generate_neighbor(solution):
+    neighbor = np.copy(solution)
+    i, j = np.random.choice(len(solution), size=2, replace=False)
+    neighbor[i], neighbor[j] = neighbor[j], neighbor[i]
+    return neighbor
+
+def simulated_annealing(initial_solution, adj_matrix, alpha, beta, gamma, delta):
     point_count = len(adj_matrix)
     temperature = int(point_count * alpha)
     _epoch_range = int(temperature * delta)
     max_iterations = int(point_count * gamma)
-    solution = get_random_permutation(point_count)
-    current_weight = permutation_weight(solution, adj_matrix)
+    current_solution = initial_solution
+    current_energy = permutation_weight(current_solution, adj_matrix)
+
+    best_solution = np.copy(current_solution)
+    best_energy = current_energy
 
     for i in range(max_iterations):
         for _epoch in range(_epoch_range):
-            swap_idx = random.sample(range(point_count), 2)
-            potential_solution = solution[:]
-            potential_solution[swap_idx[0]], potential_solution[swap_idx[1]] = (
-                potential_solution[swap_idx[1]],
-                potential_solution[swap_idx[0]],
-            )
-            potential_weight = permutation_weight(potential_solution, adj_matrix)
+            neighbor_solution = generate_neighbor(current_solution)
+            neighbor_energy = calculate_total_distance(neighbor_solution, adj_matrix)
 
-            if potential_weight < current_weight:
-                current_weight = potential_weight
-                solution = potential_solution
-            elif random.random() < math.exp((current_weight - potential_weight) / temperature):
-                current_weight = potential_weight
-                solution = potential_solution
+            delta_energy = neighbor_energy - current_energy
+
+            if delta_energy < 0 or random.uniform(0, 1) < math.exp(-delta_energy / temperature):
+                current_solution = neighbor_solution
+                current_energy = neighbor_energy
+
+            if current_energy < best_energy:
+                best_solution = np.copy(current_solution)
+                best_energy = current_energy
 
         temperature *= beta
 
-    return solution, current_weight
+    return best_solution, best_energy
 
 def tabu_search(initial_solution, adj_matrix, alpha, beta):
     point_count = len(adj_matrix)
@@ -218,32 +212,36 @@ def tabu_search(initial_solution, adj_matrix, alpha, beta):
  
     return best_solution, permutation_weight(best_solution, adj_matrix)
 
+def do_the_thing(file_name: str):
+    graph, points, points_count = par.parse(f'./data/{file_name}.tsp')
+    adj_matrix = points_to_matrix(points)
+
+    mst, parent = prim_MST(graph, len(graph))
+    weight_mst = weight_MST(parent, graph, len(graph))
+    edges_list = convert_MST_to_adjacency_matrix(mst)
+    n = len(points) - 1
+    tsp_permutation = []
+    visited_nodes = [False] * len(mst)
+    DFS(tsp_permutation, edges_list, len(mst), 0, visited_nodes)
+    tsp_permutation.append(tsp_permutation[0])
+
+    sa, sa_best_weight = simulated_annealing(tsp_permutation, adj_matrix, alpha=0.85, beta=0.85, delta=0.7, gamma=0.7)
+    print(sa_best_weight)
+
+    tabu, tabu_best_weight = tabu_search(tsp_permutation, adj_matrix, alpha=0.1, beta=0.1)
+    print(tabu_best_weight)
+
+    result_file = open("./results/" + file_name + "_result", "a")
+    result_file.write("\nsimulated_annealing : " + str(sa_best_weight) + "\ntabu_search : " + str(tabu_best_weight) + "\n")
+    result_file.close()
+
 def main():
     for file_name in os.listdir('data'):
         file_name = file_name[:-4]
-        print(file_name)
 
-        graph, points, points_count = par.parse(f'./data/{file_name}.tsp')
-        adj_matrix = points_to_matrix(points)
-
-        mst, parent = prim_MST(graph, len(graph))
-        weight_mst = weight_MST(parent, graph, len(graph))
-        edges_list = convert_MST_to_adjacency_matrix(mst)
-        n = len(points) - 1
-        tsp_permutation = []
-        visited_nodes = [False] * len(mst)
-        DFS(tsp_permutation, edges_list, len(mst), 0, visited_nodes)
-        tsp_permutation.append(tsp_permutation[0])
-
-        sa, sa_best_weight = simulated_annealing(adj_matrix, alpha=0.5, beta=0.95, delta=0.3, gamma=0.3)
-        print(sa_best_weight)
-
-        tabu, tabu_best_weight = tabu_search(tsp_permutation, adj_matrix, alpha=0.1, beta=0.2)
-        print(tabu_best_weight)
-
-        result_file = open("./results/" + file_name + "_result", "a")
-        result_file.write("\nsimulated_annealing : " + str(sa_best_weight) + "\ntabu_search : " + str(tabu_best_weight) + "\n")
-        result_file.close()
+        do_the_thing(file_name)
+        # t1 = Process(target=do_the_thing, args=(file_name,))
+        # t1.start()
 
 if __name__ == '__main__':
     main()
