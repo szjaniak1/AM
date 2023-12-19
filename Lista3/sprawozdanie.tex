@@ -16,7 +16,7 @@
 \maketitle
 
 \section*{Opis problemu}
-	Testujemy algorytm Tabu Search oraz algorytm symulowanego wyżarzania.
+	Testujemy metaheurystykę Tabu Search oraz Symulowanego wyżarzania.
 
 \subsection*{Porównanie wyników dla rozwiązań bazujących na MST oraz losowej permutacji}
     \begin{center}
@@ -27,12 +27,12 @@
             \hline\hline
             xqg237 & 1526 & 3048\\
             \hline
-            pbl395 & 1883 & 4152\\
+            pbl395 & 2523 & 5152\\
             \hline
-           	pbm436 & 2112 & 4870\\
+           	pbm436 & 3013 & 6470\\
         \hline
 		\end{tabular}}
-		\\Waga najlepszych uzyskanych rozwiązań dla algorytmu symulowanego wyżarzania.
+		\\Waga najlepszych uzyskanych rozwiązań dla Symulowanego wyżarzania.
     \end{center}
 \subsection*{Wnioski}
 	Widzimy, że bazowanie na MST znacząco poprawia jakość rozwiązań już dla bardzo małych danych. Dysproporcja zwiększa się wraz ze zwiększaniem ilości wierzchołków.
@@ -60,47 +60,47 @@
 		\item Rozwiązanie początkowe: oparte o MST
 	\end{itemize}
 
+\subsection*{Wyniki}
 \begin{table}[h!]
     \centering
-    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \begin{tabular}{|c|c|c|c|c|c|}
         \hline
-        \multirow{2}{*}{Przykład} & \multicolumn{2}{|c|}{$local\_search$ 1} & \multicolumn{2}{|c|}{$local\_search$ 2}  & \multicolumn{2}{|c|}{$local\_search$ 3}  \\
-        \cline{2-7}
-        & \multicolumn{2}{c|}{średnia} & \multicolumn{2}{c|}{średnia} & \multicolumn{2}{c|}{średnia} \\
-        \cline{2-4} \cline{4-5} \cline{6-7}
-        & liczba popraw & suma wag & liczba popraw & suma wag & liczba popraw & suma wag \\
+        \multirow{2}{*}{Przykład} & \multirow{2}{*}{Optymalna trasa} & \multicolumn{2}{|c|}{Sumulowane Wyżarzanie}  & \multicolumn{2}{|c|}{Tabu Search}  \\
+        \cline{3-6}
+        & & śr. waga & min. waga & śr. waga & min. waga \\
         \hline
-        xqf131 & 28.8 & 701.9 & 62.3 & 712.4 & 51.9 & 722.4 \\
+        xqf131 & 564 & 1023 & 902 & 976 & 863 \\
         \hline
-        xqg237 & 37.0 & 1483.7 & 130.5 & 1415.8 & 112.2 & 1445.9 \\
+        xqg237 & 1019 & 1756 & 1526 & 1689 & 1423 \\
         \hline
-        pma343 & 75.8 & 1650.3 & 201.9 & 1684.7 & 183.3 & 1717.1 \\
+        pma343 & 1368 & 2395 & 2110 & 2154 & 1922 \\
         \hline
-        pka379 & 78.9 & 1716.3 & 224.7 & 1745.9 & 204.9 & 1742.7 \\
+        pka379 & 1332 & 2380 & 2252 & 2298 & 2079 \\
         \hline
-        bcl380 & 62.7 & 1949.3 & 223.7 & 1917.5 & 189.2 & 1913.5 \\
+        bcl380 & 1621 & 2630 & 2437 & 2350 & 2221 \\
         \hline
-        pbl395 & 80.0 & 1771.5 & 227.8 & 1829.0 & 193.4 & 1876.2 \\
+        pbl395 & 1281 & 2863 & 2523 & 2577 & 2349 \\
         \hline
-        pbk411 & 81.6 & 1837.9 & 242.7 & 1888.5 & 203.6 & 2181.15 \\
+        pbk411 & 1343 & 3031 & 2761 & 2733 & 2589 \\
         \hline
-        pbn423 & 72.3 & 1873.9 & 249.0 & 1921.6 & 219.8 & 2081.5 \\
+        pbn423 & 1365 & 3257 & 2857 & 2868 & 2620 \\
         \hline
-        pbm436 & 97.85 & 2562.5 & 256.8 & 2312.0 & 217.4 & 2363.1 \\
+        pbm436 & 1443 & 3340 & 3013 & 2963 & 2865 \\
         \hline
-        xql662 & 122.6 & 3690.4 & 405.4 & 3813.3 & 349.1 & 3917.5 \\
+        xql662 & 2513 & 4382 & 3903 & 4192 & 3891 \\
         \hline
-        xit1083 & 191.6 & 4312.2 & 693.7 & 4721.2 & 623.9 & 4826.1 \\
+        xit1083 & 3558 & 5125 & 4946 & 4909 & 4768 \\
         \hline
-        icw1483 & 278.8 & 5034.6 & 973.4 & 5301.2 & 834.5 & 5718.2 \\
+        icw1483 & 4416 & 6531 & 6228 & 6339 & 6139 \\
         \hline
-        djc1785 & 382.6 & 6733.8 & 1193.9 & 6872.1 & 1032.6 & 7764.5 \\
+        djc1785 & 6115 & 7943 & 7660 & 7570 & 7450 \\
         \hline
-        dcb2086 & 390.9 & 7454.2 & 2392.6 & 7457.8 & 1222.2 & 8888.3 \\
+        dcb2086 & 6600 & 8629 & 8521 & 8471 & 8257 \\
         \hline
-        pds2566 & 457.3 & 8671.4 & 1742.9 & 8701.8 & 1526.0 & 10687.5 \\
+        pds2566 & 7643 & 10131 & 9856 & 9429 & 9263 \\
         \hline
     \end{tabular}
+    \caption{Porównanie wyników metaheurystyk: Symulowane Wyżarzanie oraz Tabu Search.}
 \end{table}
 
 \end{document}
