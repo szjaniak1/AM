@@ -24,15 +24,10 @@
 \section*{Opis problemu}
     Testujemy algorytm genetyczny.
 
-\subsection{Mutacje}
-\begin{itemize}
-    \item Zamiana dwóch losowych wierzchołków
-    \item Odwrócenie kolejności wierzchołków między dwoma losowymi wierzchołkami
-\end{itemize}
-
-\section{Wybór parametrów}
+\section*{Wybór parametrów}
 \begin{itemize}
     \item Krzyżowanie: CX(Cycle Crossover)
+    \item Mutacje: odwrócenie kolejności wierzchołków między dwoma losowymi wierzchołkami
     \item Rozmiar populacji: 64
     \item Liczba wysp: 4
     \item Liczba epok: 10
@@ -40,48 +35,48 @@
     \item Prawdopodobieństwo mutacji: 0.1
 \end{itemize}
 
-\section{Porównanie zaimplementowanych heurystyk}
+\section*{Porównanie zaimplementowanych heurystyk}
 \begin{table}[h!]
     \centering
     \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
         \hline
         dane & Opt & MST & TSP & LS & SA & TS & AG \\
         \hline
-        xqf131 & 564 & 476 & 756 & 612 & 902 & 863 & 582 \\
+        xqf131 & 564 & 476 & 756 & 612 & 902 & 863 & 812 \\
         \hline
-        xqg237 & 1019 & 906 & 1380 & 1097 & 1526 & 1423 & 1087 \\
+        xqg237 & 1019 & 906 & 1380 & 1097 & 1526 & 1423 & 1387 \\
         \hline
-        pma343 & 1368 & 1183 & 1810 & 1474 & 2110 & 1922 & 1461 \\
+        pma343 & 1368 & 1183 & 1810 & 1474 & 2110 & 1922 & 1661 \\
         \hline
-        pka379 & 1332 & 1160 & 1851 & 1418 & 2252 & 2079 & 1438 \\
+        pka379 & 1332 & 1160 & 1851 & 1418 & 2252 & 2079 & 1538 \\
         \hline
-        bcl380 & 1621 & 1453 & 2307 & 1748 & 2437 & 2221 & 1796 \\
+        bcl380 & 1621 & 1453 & 2307 & 1748 & 2437 & 2221 & 1996 \\
         \hline
-        pbl395 & 1281 & 1132 & 1753 & 1374 & 2525 & 2349 & 1406 \\
+        pbl395 & 1281 & 1132 & 1753 & 1374 & 2525 & 2349 & 2006 \\
         \hline
-        pbk411 & 1343 & 1189 & 1793 & 1488 & 2761 & 2589 & 1483 \\
+        pbk411 & 1343 & 1189 & 1793 & 1488 & 2761 & 2589 & 2183 \\
         \hline
-        pbn423 & 1365 & 1210 & 1873 & 1521 & 2857 & 2620 & 1509 \\
+        pbn423 & 1365 & 1210 & 1873 & 1521 & 2857 & 2620 & 2309 \\
         \hline
-        pbm436 & 1443 & 1277 & 1970 & 1612 & 3013 & 2865 & 1587 \\
+        pbm436 & 1443 & 1277 & 1970 & 1612 & 3013 & 2865 & 2487 \\
         \hline
-        xql662 & 2513 & 2249 & 3571 & 2813 & 3903 & 3891 & 2809 \\
+        xql662 & 2513 & 2249 & 3571 & 2813 & 3903 & 3891 & 3009 \\
         \hline
-        xit1083 & 3558 & 3256 & 4996 & 4117 & 4946 & 4768 & 4011 \\
+        xit1083 & 3558 & 3256 & 4996 & 4117 & 4946 & 4768 & 4419 \\
         \hline
         icw1483 & 4416 & 4017 & 5927 & 4956 & 6228 & 6139 & 5038 \\
         \hline
-        djc1785 & 6115 & 5550 & 8282 & 6872 & 7660 & 7450 & 6927 \\
+        djc1785 & 6115 & 5550 & 8282 & 6872 & 7660 & 7450 & 7122 \\
         \hline
-        dcb2086 & 6600 & 5958 & 9186 & 7651 & 8521 & 8257 & 7503 \\
+        dcb2086 & 6600 & 5958 & 9186 & 7651 & 8521 & 8257 & 8003 \\
         \hline
-        pds2566 & 7643 & 6964 & 10673 & 8904 & 9856 & 9429 & 8787 \\
+        pds2566 & 7643 & 6964 & 10673 & 8904 & 9856 & 9429 & 9087 \\
         \hline
     \end{tabular}
-    \caption{MST, Local Search, Symulowanego Wyżarzanie, Tabu Search, Algorytmu Genetyczny.}
+    \caption{TSP, Local Search, Symulowanego Wyżarzanie, Tabu Search, Algorytmu Genetyczny.}
 \end{table}
 
-\subsection{Ranking zaimplementowanych algorytmów}
+\subsection*{Ranking zaimplementowanych algorytmów}
 \begin{enumerate}
     \item Local Search
     \item Algorytm Genetyczny
